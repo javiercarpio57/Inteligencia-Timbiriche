@@ -33,8 +33,6 @@ def onReady(server):
     movement = random.randint(0, 1)
     line = random.randint(0, 29)
 
-    print(movement, line)
-
     while int(timbiriche.board[movement][line]) != 99:
         movement = random.randint(0, 1)
         line = random.randint(0, 29)
