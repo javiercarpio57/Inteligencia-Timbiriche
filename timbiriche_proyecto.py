@@ -1,4 +1,5 @@
 import socketio
+import random
 import numpy as np
 
 sio = socketio.Client()
@@ -27,13 +28,16 @@ def onReady(server):
 
     timbiriche.player_id = server['player_turn_id']
     timbiriche.gameID = server['game_id']
+    timbiriche.board = server['board']
 
-    movement = int(input("0: Horizontal\n1: Vertical\n\t"))
-    line = int(input("0 - 29: "))
+    movement = random.randint(0, 1)
+    line = random.randint(0, 29)
+
+    print(movement, line)
 
     while int(timbiriche.board[movement][line]) != 99:
-        movement = int(input("0: Horizontal\n1: Vertical\n\t"))
-        line = int(input("0 - 29: "))
+        movement = random.randint(0, 1)
+        line = random.randint(0, 29)
 
     sio.emit('play', {
         'player_turn_id': timbiriche.player_id,
