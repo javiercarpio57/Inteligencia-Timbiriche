@@ -11,6 +11,63 @@ class Timbiriche:
         self.gameID = ""
         self.board = []
         self.player_id = 0
+        self.oponnent_id = 0
+
+    def max_alpha_beta(self, alpha, beta):
+        maxv = -2
+
+        px = None
+        py = None
+
+        for i in range(len(self.board)):
+            for j in range(len(self.board[0])):
+                if int(self.board[i][j]) == 99:
+                    self.board[i][j] = self.player_id
+                    (m, min_i, min_j) = self.min_alpha_beta(alpha, beta)
+
+                    print('max:', (m, min_i, min_j))
+                    if m > maxv:
+                        maxv = m
+                        px = i
+                        py = j
+
+                    self.board[i][j] = 99
+
+                    if maxv >= beta:
+                        return (maxv, px, py)
+                    
+                    if maxv > alpha:
+                        alpha = maxv
+
+        return (maxv, px, py)
+
+    def min_alpha_beta(self, alpha, beta):
+        minv = 2
+
+        qx = None
+        qy = None
+
+        for i in range(len(self.board)):
+            for j in range(len(self.board[0])):
+                if int(self.board[i][j]) == 99:
+                    self.board[i][j] = self.oponnent_id
+                    (m, max_i, max_j) = self.min_alpha_beta(alpha, beta)
+                    print('min:', (m, max_i, max_j))
+
+                    if m < minv:
+                        minv = m
+                        qx = i
+                        qy = j
+
+                    self.board[i][j] = 99
+
+                    if minv <= alpha:
+                        return (minv, qx, qy)
+                    
+                    if minv < beta:
+                        beta = minv
+
+        return (minv, qx, qy)
 
 @sio.on('connect')
 def onConnect():
@@ -72,6 +129,10 @@ def disconnect():
 def restart():
     row = np.ones(30) * 99
     timbiriche.board = [np.ndarray.tolist(row), np.ndarray.tolist(row)]
+
+
+
+
 
 
 timbiriche = Timbiriche()
