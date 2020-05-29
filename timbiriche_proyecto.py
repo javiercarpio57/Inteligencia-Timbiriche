@@ -1,6 +1,7 @@
 import socketio
-import random
+# import random
 import numpy as np
+import math
 
 sio = socketio.Client()
 
@@ -13,61 +14,112 @@ class Timbiriche:
         self.player_id = 0
         self.oponnent_id = 0
 
-    def max_alpha_beta(self, alpha, beta):
-        maxv = -2
 
-        px = None
-        py = None
+def minimax(move, board, depth, alpha, beta, idPlayer):
+    # print('DEPTH:', depth)
+    if depth == 0 or 99 not in np.asarray(board).reshape(-1):
+        return getPoints(board, idPlayer, move), move
 
-        for i in range(len(self.board)):
-            for j in range(len(self.board[0])):
-                if int(self.board[i][j]) == 99:
-                    self.board[i][j] = self.player_id
-                    (m, min_i, min_j) = self.min_alpha_beta(alpha, beta)
+    if idPlayer == timbiriche.player_id:
+        
+        maxEval = -math.inf
 
-                    print('max:', (m, min_i, min_j))
-                    if m > maxv:
-                        maxv = m
-                        px = i
-                        py = j
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] == 99:
+                    move = (i, j)
+                    board[i][j] = idPlayer
 
-                    self.board[i][j] = 99
+                    value, _ = minimax(move, board, depth - 1, alpha, beta, (idPlayer % 2) + 1)
 
-                    if maxv >= beta:
-                        return (maxv, px, py)
-                    
-                    if maxv > alpha:
-                        alpha = maxv
+                    board[i][j] = 99
+                    maxEval = max(maxEval, value)
+                    alpha = max(alpha, value)
 
-        return (maxv, px, py)
+                    if beta <= alpha:
+                        break
+        return maxEval, move
 
-    def min_alpha_beta(self, alpha, beta):
-        minv = 2
+    else:
+        minEval = math.inf
 
-        qx = None
-        qy = None
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] == 99:
+                    move = (i, j)
+                    board[i][j] = idPlayer
 
-        for i in range(len(self.board)):
-            for j in range(len(self.board[0])):
-                if int(self.board[i][j]) == 99:
-                    self.board[i][j] = self.oponnent_id
-                    (m, max_i, max_j) = self.min_alpha_beta(alpha, beta)
-                    print('min:', (m, max_i, max_j))
+                    value, _ = minimax(move, board, depth - 1, alpha, beta, (idPlayer % 2) + 1)
 
-                    if m < minv:
-                        minv = m
-                        qx = i
-                        qy = j
+                    minEval = min(minEval, value)
+                    beta = min(beta, value)
 
-                    self.board[i][j] = 99
+        return minEval, move
 
-                    if minv <= alpha:
-                        return (minv, qx, qy)
-                    
-                    if minv < beta:
-                        beta = minv
 
-        return (minv, qx, qy)
+def getPoints(board, playerNumber, move):
+    EMPTY = 99
+    FILL = 0
+    FILLEDP11 = 1
+    FILLEDP12 = 2
+    FILLEDP21 = -1
+    FILLEDP22 = -2
+    N = 6
+
+    punteoInicial = 0
+    punteoFinal = 0
+
+    acumulador = 0
+    contador = 0
+
+    for i in range(len(board[0])):
+        if ((i + 1) % N) != 0:
+            if board[0][i] != EMPTY and board[0][i + 1] != EMPTY and board[1][contador + acumulador] != EMPTY and board[1][contador + acumulador + 1] != EMPTY:
+                punteoInicial = punteoInicial + 1
+            acumulador = acumulador + N
+        else:
+            contador = contador + 1
+            acumulador = 0
+
+    # return punteoFinal - punteoInicial
+    return punteoInicial
+
+def humanBoard(board):
+    resultado = ''
+    acumulador = 0
+
+    for i in range(int(len(board[0])/5)):
+        if board[0][i] == 99:
+            resultado = resultado + '*   '
+        else:
+            resultado = resultado + '* - '
+        if board[0][i+6] == 99:
+            resultado = resultado + '*   '
+        else:
+            resultado = resultado + '* - '
+        if board[0][i+12] == 99:
+            resultado = resultado + '*   '
+        else:
+            resultado = resultado + '* - '
+        if board[0][i+18] == 99:
+            resultado = resultado + '*   '
+        else:
+            resultado = resultado + '* - '
+        if board[0][i+24] == 99:
+            resultado = resultado + '*   *\n'
+        else:
+            resultado = resultado + '* - *\n'
+
+        if i != 5:
+            for j in range(int(len(board[1])/5)):
+                if board[1][j + acumulador] == 99:
+                    resultado = resultado + '    '
+                else:
+                    resultado = resultado + '|   '
+            acumulador = acumulador + 6
+            resultado = resultado + '\n'
+
+    return resultado
 
 @sio.on('connect')
 def onConnect():
@@ -80,31 +132,38 @@ def onConnect():
 
 @sio.on('ready')
 def onReady(server):
-    print('Ready')
-    print(server)
 
     timbiriche.player_id = server['player_turn_id']
     timbiriche.gameID = server['game_id']
     timbiriche.board = server['board']
 
-    movement = random.randint(0, 1)
-    line = random.randint(0, 29)
+    # print('MY ID:', server['player_turn_id'])
+
+    print(humanBoard(server['board']))
+
+    _, move = minimax(None, server['board'], 3, -math.inf, math.inf, server['player_turn_id'])
+
+    # print(move)
+    movement = move[0]
+    line = move[1]
 
     while int(timbiriche.board[movement][line]) != 99:
-        movement = random.randint(0, 1)
-        line = random.randint(0, 29)
+        _, move = minimax(None, server['board'], 3, -math.inf, math.inf, server['player_turn_id'])
+        movement = move[0]
+        line = move[1]
+
+
+    print('MOVIMIENTO:', move)
 
     sio.emit('play', {
-        'player_turn_id': timbiriche.player_id,
+        'player_turn_id': server['player_turn_id'],
         'tournament_id': timbiriche.tid,
-        'game_id': timbiriche.gameID,
+        'game_id': server['game_id'],
         'movement': [movement, line]
     })
 
 @sio.on('finish')
 def on_finish(server):
-    print('The game', timbiriche.gameID, 'has finished.')
-
     restart()
 
     if server['player_turn_id'] == server['winner_turn_id']:
@@ -131,19 +190,11 @@ def restart():
     timbiriche.board = [np.ndarray.tolist(row), np.ndarray.tolist(row)]
 
 
-
-
-
-
 timbiriche = Timbiriche()
-timbiriche.username = input("Ingrese su usuario: ")
+# timbiriche.username = input("Ingrese su usuario: ")
+timbiriche.username = 'INTELIGENCIA'
 timbiriche.tid = input("Ingrese el Tournament ID: ")
 
 host = input("Ingrese el host: ")
 
 sio.connect(host)
-
-
-
-
-
