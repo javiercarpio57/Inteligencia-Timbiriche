@@ -79,8 +79,8 @@ timbiriche.username = input("Ingrese su usuario: ")
 # timbiriche.username = 'Javier'
 # timbiriche.tid = input("Ingrese el Tournament ID: ")
 timbiriche.tid = '1'
-timbiriche.look = int(input('LOOK AHEAD: '))
-# timbiriche.look = 1
+# timbiriche.look = int(input('LOOK AHEAD: '))
+timbiriche.look = 2
 
 # host = input("Ingrese el host: ")
 host = 'http://localhost:4000'
