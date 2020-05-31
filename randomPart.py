@@ -12,6 +12,8 @@ class Timbiriche:
         self.board = []
         self.player_id = 0
         self.oponnent_id = 0
+        self.win = 0
+        self.lost = 0
 
 @sio.on('connect')
 def onConnect():
@@ -24,9 +26,6 @@ def onConnect():
 
 @sio.on('ready')
 def onReady(server):
-    # print('Ready')
-    # print(server)
-
     timbiriche.player_id = server['player_turn_id']
     timbiriche.gameID = server['game_id']
     timbiriche.board = server['board']
@@ -53,8 +52,10 @@ def on_finish(server):
 
     if server['player_turn_id'] == server['winner_turn_id']:
         print("Ganaste :D")
+        timbiriche.win += 1
     else:
         print("Perdiste :(")
+        timbiriche.lost += 1
 
     sio.emit('player_ready', {
         'tournament_id': timbiriche.tid,
@@ -78,8 +79,10 @@ def restart():
 timbiriche = Timbiriche()
 # timbiriche.username = input("Ingrese su usuario: ")
 timbiriche.username = 'RANDOM'
-timbiriche.tid = input("Ingrese el Tournament ID: ")
+# timbiriche.tid = input("Ingrese el Tournament ID: ")
+timbiriche.tid = '1'
 
-host = input("Ingrese el host: ")
+# host = input("Ingrese el host: ")
+host = 'http://localhost:4000'
 
 sio.connect(host)
