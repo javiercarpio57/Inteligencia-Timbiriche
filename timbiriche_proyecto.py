@@ -53,7 +53,7 @@ def on_finish(server):
         print("Ganaste :D (", timbiriche.win, '-', timbiriche.lost, ")")
     else:
         timbiriche.lost += 1
-        print("Perdiste :( (", timbiriche.win, '-', timbiriche.lost, ")"
+        print("Perdiste :( (", timbiriche.win, '-', timbiriche.lost, ")")
 
     sio.emit('player_ready', {
         'tournament_id': timbiriche.tid,
@@ -78,11 +78,11 @@ timbiriche = Timbiriche()
 timbiriche.username = input("Ingrese su usuario: ")
 # timbiriche.username = 'Javier'
 # timbiriche.tid = input("Ingrese el Tournament ID: ")
-timbiriche.tid = '1'
+timbiriche.tid = '12'
 # timbiriche.look = int(input('LOOK AHEAD: '))
 timbiriche.look = 2
 
 # host = input("Ingrese el host: ")
-host = 'http://localhost:4000'
+host = 'http://5c5a7bed417f.ngrok.io'
 
 sio.connect(host)
