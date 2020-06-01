@@ -34,9 +34,10 @@ def onReady(server):
     timbiriche.player_id = server['player_turn_id']
     timbiriche.gameID = server['game_id']
     timbiriche.board = server['board']
-
+    print('\n', humanBoard(server['board']))
     move = suggestMove(server['board'], server['player_turn_id'], timbiriche.look)
 
+    print('ENVIADO')
     sio.emit('play', {
         'player_turn_id': server['player_turn_id'],
         'tournament_id': timbiriche.tid,
