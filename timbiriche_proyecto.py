@@ -34,7 +34,8 @@ def onReady(server):
     timbiriche.player_id = server['player_turn_id']
     timbiriche.gameID = server['game_id']
     timbiriche.board = server['board']
-    print('\n', humanBoard(server['board']))
+    print()
+    print(humanBoard(server['board']))
     move = suggestMove(server['board'], server['player_turn_id'], timbiriche.look)
 
     print('ENVIADO')
@@ -77,13 +78,13 @@ def restart():
 
 timbiriche = Timbiriche()
 timbiriche.username = input("Ingrese su usuario: ")
-# timbiriche.username = 'Javier'
+# timbiriche.username = 'Javi'
 # timbiriche.tid = input("Ingrese el Tournament ID: ")
-timbiriche.tid = '12'
-# timbiriche.look = int(input('LOOK AHEAD: '))
-timbiriche.look = 2
+timbiriche.tid = '1'
+timbiriche.look = int(input('LOOK AHEAD: '))
+# timbiriche.look = 2
 
 # host = input("Ingrese el host: ")
-host = 'http://5c5a7bed417f.ngrok.io'
+host = 'http://localhost:4000'
 
 sio.connect(host)

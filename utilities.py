@@ -9,6 +9,7 @@ def getPossibleMoves(board):
             if int(board[i][j]) == 99:
                 moves.append((i, j))
 
+    random.shuffle(moves)
     return moves
 
 def minimax(board, move, depth, isMe, myId, alpha, beta):
@@ -53,15 +54,19 @@ def suggestMove(board, myId, lookahead):
     possibleMoves = []
 
     possible = getPossibleMoves(board)
-    for movimiento in possible:
-        score = minimax(board, movimiento, int(lookahead), False, int(myId), -infinity, infinity)
+    suma = int(np.sum(board))
+    if suma == ((99 * len(board[0])) + (99 * len(board[1]))) or suma == ((99 * len(board[0])) + (99 * (len(board[1]) - 1))):
+        return random.choice(possible)
+    else:
+        for movimiento in possible:
+            score = minimax(board, movimiento, int(lookahead), False, int(myId), -infinity, infinity)
 
-        if score > bestScore:
-            bestScore = score
-            possibleMoves.clear()
+            if score > bestScore:
+                bestScore = score
+                possibleMoves.clear()
 
-        if score >= bestScore:
-            possibleMoves.append(movimiento)
+            if score >= bestScore:
+                possibleMoves.append(movimiento)
 
     return random.choice(possibleMoves)
 
