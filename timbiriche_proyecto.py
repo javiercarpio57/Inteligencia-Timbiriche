@@ -1,8 +1,8 @@
 import socketio
-# import random
 import numpy as np
 from math import inf as infinity
 from utilities import *
+import time
 
 sio = socketio.Client()
 
@@ -36,8 +36,11 @@ def onReady(server):
     timbiriche.board = server['board']
     print()
     print(humanBoard(server['board']))
-    move = suggestMove(server['board'], server['player_turn_id'], timbiriche.look)
 
+    start_time = time.time()
+    move = suggestMove(server['board'], server['player_turn_id'], timbiriche.look)
+    print("--- %s seconds ---" % (time.time() - start_time))
+    
     print('ENVIADO')
     sio.emit('play', {
         'player_turn_id': server['player_turn_id'],
