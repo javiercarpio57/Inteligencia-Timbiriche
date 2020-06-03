@@ -28,26 +28,33 @@ def onConnect():
         'user_role': 'player'
     }) 
 
+    if timbiriche.gameID != "":
+        sio.emit('player_ready', {
+            'tournament_id': timbiriche.tid,
+            'game_id': timbiriche.gameID,
+            'player_turn_id': timbiriche.player_id
+        })
+
 @sio.on('ready')
 def onReady(server):
 
     timbiriche.player_id = server['player_turn_id']
     timbiriche.gameID = server['game_id']
     timbiriche.board = server['board']
-    print()
-    print(humanBoard(server['board']))
-
+    
+    print('PENSANDO...')
     start_time = time.time()
     move = suggestMove(server['board'], server['player_turn_id'], timbiriche.look)
     print("--- %s seconds ---" % (time.time() - start_time))
-    
-    print('ENVIADO')
+    print()
+    print(humanBoard(server['board']))
     sio.emit('play', {
         'player_turn_id': server['player_turn_id'],
         'tournament_id': timbiriche.tid,
         'game_id': server['game_id'],
         'movement': [move[0], move[1]]
     })
+    print('ENVIADO..')
 
 @sio.on('finish')
 def on_finish(server):
@@ -82,12 +89,12 @@ def restart():
 timbiriche = Timbiriche()
 timbiriche.username = input("Ingrese su usuario: ")
 # timbiriche.username = 'Javi'
-# timbiriche.tid = input("Ingrese el Tournament ID: ")
-timbiriche.tid = '1'
-timbiriche.look = int(input('LOOK AHEAD: '))
-# timbiriche.look = 2
+timbiriche.tid = input("Ingrese el Tournament ID: ")
+# timbiriche.tid = '1'
+# timbiriche.look = int(input('LOOK AHEAD: '))
+timbiriche.look = 2
 
-# host = input("Ingrese el host: ")
-host = 'http://localhost:4000'
+host = input("Ingrese el host: ")
+# host = 'http://localhost:4000'
 
 sio.connect(host)

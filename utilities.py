@@ -46,6 +46,9 @@ def minimax(board, move, depth, isMe, myId, alpha, beta):
             minEval = min(minEval, value)
             beta = min(beta, value)
 
+            if beta <= alpha:
+                break
+
         board[move[0]][move[1]] = 99
         return minEval
 
